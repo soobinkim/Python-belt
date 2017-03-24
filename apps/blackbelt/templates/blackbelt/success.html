@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Quotes</title>
+
+    <body>
+        <h1>Hello, {{User.first_name}}!</h1>
+        <div class="logout">
+          <a href="/favorited_quotes">Quotable Quotes!</a>
+        </div>
+        <div class="msg">
+          <form action="message/{{user.id}}" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="button" value="message">
+              <textarea name="message" rows="8" cols="40" placeholder="post your quotes"></textarea>
+              <input type="submit" value="Post">
+          </form>
+        </div>
+        <h2>Quotable Quotes</h2>
+        <!-- Loop through all the messages in Secret table -->
+        {% for message in messages%}
+            <!-- Print out the message, how long ago it was created, and the number of likes -->
+            <div>{{message.message}}    ({{ message.created_at | timesince }})
+                Favorited {{message.numlike}} times.
+                <!-- If the current user has any posts listed on the wall, it will tell you that that is your post and give you a delete button -->
+                {% if message.user.id == request.session.id %}
+                    <span> You Posted This.</span>
+                    <!-- Delete button for the user that posted the message -->
+                    <form action="/delete/{{message.id}}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="button" value="delete">
+                        <input type="submit" value="Delete">
+                    </form>
+
+                {% elif user in message.like.all %}
+                    You liked this already
+
+                {% else %}
+                    <form action="/messages/{{message.id}}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="button" value="favorite">
+                        <input type="submit" value="favorite">
+                    </form>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <br>
+        <div class="logout">
+          <form action="/logout" method="post">
+              {% csrf_token %}
+              <input type="submit" value="logout">
+          </form>
+        </div>
+    </body>
+</html>

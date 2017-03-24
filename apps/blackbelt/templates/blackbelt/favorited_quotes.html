@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Quotable quotes</title>
+
+    </head>
+    <body>
+        <a href="/success">Back</a>
+        <h1>Trending quotes</h1>
+        {% for message in quotes%}
+
+            <div>{{message.favorites}}    ({{ message.created_at | timesince }})
+                Favorited {{message.numlike}} times.
+                <!-- If the current user has any quotes listed on the wall, it will tell you that is your quote and give you a delete button -->
+                {% if message.user.id == request.session.id %}
+                    <span> You Posted This.</span>
+                    <!-- Delete button for the user that posted the quote -->
+                    <form action="/delete/{{message.id}}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="button" value="delete2">
+                        <input type="submit" value="Delete">
+                    </form>
+
+                {% elif user in message.like.all %}
+                    You favorited this already
+
+                {% else %}
+                    <form action="/messages/{{message.id}}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="button" value="favorite2">
+                        <input type="submit" value="favorite">
+                    </form>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </body>
+</html>
